@@ -11,6 +11,7 @@ import edu.princeton.cs.algs4.Digraph;
 public class SAP {
 
 	// constructor takes a digraph (not necessarily a DAG)
+	/*How can I make the data type SAP immutable? You can (and should) save the associated digraph in an instance variable. However, because our Digraph data type is mutable, you must first make a defensive copy by calling the copy constructor. */
 	public SAP(Digraph G) {
 		if (G == null) {
 			throw new java.lang.NullPointerException();
