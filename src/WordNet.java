@@ -155,8 +155,9 @@ buildGraph(hypernyms);
 
 	// do unit testing of this class
 	public static void main(String[] args) {
-//testLoadWordNet();
-//test1();
+testLoadWordNet();
+test1();
+test2();
 testDistance();
 	}
 	
@@ -193,6 +194,15 @@ testDistance();
 		assert sap.equals("animal animate_being beast brute creature fauna");
 	}
 
+	private static void test2() {
+		System.out.println("test2");
+		
+		WordNet wn = getWordNetFull();
+		String sap = wn.sap("individual", "edible_fruit");
+		
+		assert sap.contains("physical_entity");
+	}
+	
 	private static void testLoadWordNet() {
 		System.out.println("testLoadWordNet");
 				
