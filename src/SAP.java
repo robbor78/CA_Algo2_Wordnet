@@ -8,6 +8,8 @@ where E and V are the number of edges and vertices in the digraph, respectively.
 Your data type should use space proportional to E + V. */
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class SAP {
 
 		g = new Digraph(G);
 
-		cache = new HashMap<>();
+		cache = new Cache();
 
 	}
 
@@ -118,8 +120,8 @@ public class SAP {
 		String wName = getKey(w);
 
 		Result r = null;
-		if (inCache(vName, wName)) {
-			r = cache.get(vName).get(wName);
+		if (cache.isInCache(vName, wName)) {
+			r = cache.get(vName,wName);
 		} else {
 			int bestAncestor = 0;
 			int bestDistance = Integer.MAX_VALUE;
@@ -161,8 +163,7 @@ public class SAP {
 			}
 
 			if (r != null) {
-				cache.put(vName, new HashMap<String, Result>());
-				cache.get(vName).put(wName, r);
+				cache.put(vName, wName, r);
 			}
 		}
 
@@ -180,21 +181,45 @@ public class SAP {
 		return vName;
 	}
 
-	private boolean inCache(String v, String w) {
-		return cache.containsKey(v) && cache.get(v).containsKey(w);
-	}
-
 	private Digraph g;
+	private Cache cache;
 
-	private HashMap<String, HashMap<String, Result>> cache;
+	
+	private class Cache {
+		private HashMap<String, HashMap<String, Result>> cache;
+
+		private Cache() {
+			cache = new HashMap<>();
+		}
+		
+		private boolean isInCache(String v, String w) {
+			boolean isInCache = cache.containsKey(v) && cache.get(v).containsKey(w);			
+//			if (isInCache) {
+//				cache.get(v).get(w).ts = Calendar.getInstance().getTime();
+//			}			
+			return isInCache;
+		}
+		
+		private Result get(String v, String w) {
+			//cache.get(v).get(w).ts = Calendar.getInstance().getTime();
+			return cache.get(v).get(w);	
+		}
+		
+		private void put(String v, String w, Result r) {
+			cache.put(v, new HashMap<String, Result>());
+			cache.get(v).put(w, r);
+		}
+	}
 
 	private class Result {
 		private int length;
 		private int ancestor;
+		//private Date ts;
 
 		Result(int length, int ancestor) {
 			this.length = length;
 			this.ancestor = ancestor;
+			//ts = Calendar.getInstance().getTime();
 		}
 		
 		@Override
