@@ -58,22 +58,8 @@ buildGraph(hypernyms);
 		 * java.lang.IllegalArgumentException unless both of the noun arguments
 		 * are WordNet nouns.
 		 */
-		if (!isNoun(nounA) || !isNoun(nounB)) {
-			throw new java.lang.IllegalArgumentException();
-		}
-
-		// The methods distance() and sap() should run in time linear in the
-		// size of the WordNet digraph.
-				
-		int a = mapNoun2ID.get(nounA).iterator().next();
-		int b = mapNoun2ID.get(nounB).iterator().next();
-		
-		return sap.length(a, b);
-
 		Function3<Integer,Integer,Integer> f = (v,w) -> sap.length(v, w);
-		int ancestor = doStuff(nounA,nounB,f);
-		return mapID2Noun.get(ancestor).iterator().next();
-
+		return searchWordNet(nounA,nounB,f);
 	}
 
 	// a synset (second field of synsets.txt) that is the common ancestor of
@@ -89,11 +75,11 @@ buildGraph(hypernyms);
 		// size of the WordNet digraph.
 
 		Function3<Integer,Integer,Integer> f = (v,w) -> sap.ancestor(v, w);
-		int ancestor = doStuff(nounA,nounB,f);
-		return mapID2Noun.get(ancestor).iterator().next();
+		int ancestor = searchWordNet(nounA,nounB,f);
+		return mapID2Noun.get(ancestor);//.iterator().next();
 	}
 	
-	private <T> T doStuff(String nounA, String nounB, Function3<Integer, Integer, T> f) {
+	private <T> T searchWordNet(String nounA, String nounB, Function3<Integer, Integer, T> f) {
 		if (!isNoun(nounA) || !isNoun(nounB)) {
 			throw new java.lang.IllegalArgumentException();
 		}
@@ -114,7 +100,7 @@ buildGraph(hypernyms);
 	private void buildNounData(String filename) {
 		//example:
 		//36,AND_circuit AND_gate,a circuit in a computer that fires only when all of its inputs fire
-		mapID2Noun = new HashMap<Integer, HashSet<String>>();
+		mapID2Noun = new HashMap<Integer, String>();
 		mapNoun2ID = new HashMap<String, HashSet<Integer>>();
 		
 		In in = new In(filename);
@@ -122,13 +108,13 @@ buildGraph(hypernyms);
 			String line = in.readLine();
 			String[] parts = line.split(",");
 			int id = Integer.parseInt(parts[0]);
-			String[] nouns = parts[1].split("\\s+");
+
+			if (!mapID2Noun.containsKey(id)){
+		mapID2Noun.put(id, parts[1]);
+			}
 			
+		String[] nouns = parts[1].split("\\s+");
 			Arrays.stream(nouns).forEach(x-> {
-				if (!mapID2Noun.containsKey(id)){
-			mapID2Noun.put(id, new HashSet<String>());
-				}
-			mapID2Noun.get(id).add(x);
 			
 			if (!mapNoun2ID.containsKey(x)) {
 				mapNoun2ID.put(x, new HashSet<Integer>());
@@ -157,7 +143,7 @@ buildGraph(hypernyms);
 	}
 	
 	private SAP sap;
-	private HashMap<Integer,HashSet<String>> mapID2Noun;
+	private HashMap<Integer,String> mapID2Noun;
 	private HashMap<String, HashSet<Integer>> mapNoun2ID;
 	
 	  @FunctionalInterface
@@ -168,6 +154,31 @@ buildGraph(hypernyms);
 
 	// do unit testing of this class
 	public static void main(String[] args) {
-
+testLoadWordNet();
+test1();
 	}
+	
+	private static void test1() {
+		System.out.println("test1");
+		
+		WordNet wn = getWordNetFull();
+		String sap = wn.sap("worm", "bird");
+		
+		assert sap.equals("animal animate_being beast brute creature fauna");
+	}
+
+	private static void testLoadWordNet() {
+		System.out.println("testLoadWordNet");
+				
+		WordNet wn = getWordNetFull();
+		assert !wn.isNoun("sdfd43a");
+		assert wn.isNoun("Asclepias");
+	}
+	
+	private static WordNet getWordNetFull() {
+		return new WordNet(s,h);		
+	}
+	
+	private static final String h= "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/hypernyms.txt";
+	private static final String s= "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/synsets.txt"; 
 }
