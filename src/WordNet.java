@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.function.Function;
 
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
@@ -57,11 +58,22 @@ buildGraph(hypernyms);
 		 * java.lang.IllegalArgumentException unless both of the noun arguments
 		 * are WordNet nouns.
 		 */
+		if (!isNoun(nounA) || !isNoun(nounB)) {
+			throw new java.lang.IllegalArgumentException();
+		}
 
 		// The methods distance() and sap() should run in time linear in the
 		// size of the WordNet digraph.
+				
+		int a = mapNoun2ID.get(nounA).iterator().next();
+		int b = mapNoun2ID.get(nounB).iterator().next();
+		
+		return sap.length(a, b);
 
-		return -1;
+		Function3<Integer,Integer,Integer> f = (v,w) -> sap.length(v, w);
+		int ancestor = doStuff(nounA,nounB,f);
+		return mapID2Noun.get(ancestor).iterator().next();
+
 	}
 
 	// a synset (second field of synsets.txt) that is the common ancestor of
@@ -76,7 +88,23 @@ buildGraph(hypernyms);
 		// The methods distance() and sap() should run in time linear in the
 		// size of the WordNet digraph.
 
-		return null;
+		Function3<Integer,Integer,Integer> f = (v,w) -> sap.ancestor(v, w);
+		int ancestor = doStuff(nounA,nounB,f);
+		return mapID2Noun.get(ancestor).iterator().next();
+	}
+	
+	private <T> T doStuff(String nounA, String nounB, Function3<Integer, Integer, T> f) {
+		if (!isNoun(nounA) || !isNoun(nounB)) {
+			throw new java.lang.IllegalArgumentException();
+		}
+
+		// The methods distance() and sap() should run in time linear in the
+		// size of the WordNet digraph.
+				
+		int a = mapNoun2ID.get(nounA).iterator().next();
+		int b = mapNoun2ID.get(nounB).iterator().next();
+		
+		return f.apply(a,b);
 	}
 
 	private boolean isNullOrEmpty(String s) {
@@ -114,7 +142,7 @@ buildGraph(hypernyms);
 		//example:
 		//164,21012,56099
 		
-		g = new Digraph(mapID2Noun.size());
+		Digraph g = new Digraph(mapID2Noun.size());
 		
 		In hypernymsIn = new In(hypernyms);
 		while (hypernymsIn.hasNextLine()) {
@@ -124,11 +152,19 @@ buildGraph(hypernyms);
 			int f = hyperParts[0];
 			Arrays.stream(hyperParts).skip(1).forEach(x->g.addEdge(f, x));
 		}
+		
+		sap = new SAP(g);
 	}
 	
-	private Digraph g;
+	private SAP sap;
 	private HashMap<Integer,HashSet<String>> mapID2Noun;
 	private HashMap<String, HashSet<Integer>> mapNoun2ID;
+	
+	  @FunctionalInterface
+	    private interface Function3 <A, B, R> { 
+	    //R is like Return, but doesn't have to be last in the list nor named R.
+	        public R apply (A a, B b);
+	    }
 
 	// do unit testing of this class
 	public static void main(String[] args) {
