@@ -15,6 +15,9 @@ import java.util.Queue;
 
 import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class SAP {
 
@@ -70,16 +73,27 @@ public class SAP {
 	// length of shortest ancestral path between any vertex in v and any vertex
 	// in w; -1 if no such path
 	public int length(Iterable<Integer> v, Iterable<Integer> w) {
-		checkValidVertices(v);
-		checkValidVertices(w);
+		Result r = determineAncestor(v, w);
 
-		return -1;
+		int length = -1;
+		if (r != null) {
+			length = r.length;
+		}
+
+		return length;
 	}
 
 	// a common ancestor that participates in shortest ancestral path; -1 if no
 	// such path
 	public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-		return -1;
+		Result r = determineAncestor(v, w);
+
+		int ancestor = -1;
+		if (r != null) {
+			ancestor = r.ancestor;
+		}
+
+		return ancestor;
 	}
 
 	private void checkValidVertex(int w) {
@@ -105,7 +119,7 @@ public class SAP {
 
 		Result r = null;
 		if (inCache(vName, wName)) {
-			r = cache.get(v).get(w);
+			r = cache.get(vName).get(wName);
 		} else {
 			int bestAncestor = 0;
 			int bestDistance = Integer.MAX_VALUE;
@@ -185,6 +199,15 @@ public class SAP {
 
 	// do unit testing of this class
 	public static void main(String[] args) {
-
+		In in = new In(args[0]);
+	    Digraph G = new Digraph(in);
+	    SAP sap = new SAP(G);
+	    while (!StdIn.isEmpty()) {
+	        int v = StdIn.readInt();
+	        int w = StdIn.readInt();
+	        int length   = sap.length(v, w);
+	        int ancestor = sap.ancestor(v, w);
+	        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+	    }
 	}
 }
