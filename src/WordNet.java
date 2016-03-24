@@ -156,8 +156,32 @@ buildGraph(hypernyms);
 	public static void main(String[] args) {
 testLoadWordNet();
 test1();
+testDistance();
 	}
 	
+	private static void testDistance() {
+		System.out.println("testDistance");
+		
+		WordNet wn = getWordNetFull();
+		
+		int[] distances = {23, 33, 27, 29};
+		String[][] words = {
+				{"white_marlin", "mileage"},
+				{"Black_Plague", "black_marlin"},
+				{"American_water_spaniel", "histology"},
+				{"Brown_Swiss", "barrel_roll"}
+				};
+		
+		
+		for (int i=0; i<distances.length;i++) {
+		int actualDistance = wn.distance(words[i][0],words[i][1]);
+		System.out.println(wn.sap(words[i][0],words[i][1]));
+		int expectedDistance = distances[i];
+		assert expectedDistance == actualDistance;
+		}
+		
+	}
+
 	private static void test1() {
 		System.out.println("test1");
 		
