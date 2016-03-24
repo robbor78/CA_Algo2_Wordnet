@@ -107,7 +107,7 @@ public class WordNet {
 	}
 
 	private boolean isNullOrEmpty(String s) {
-		return s == null || s == "";
+		return s == null || s.trim().length()==0;
 	}
 
 	private void buildNounData(String filename) {
