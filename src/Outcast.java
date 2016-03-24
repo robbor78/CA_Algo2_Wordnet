@@ -1,103 +1,105 @@
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class Outcast {
-	// constructor takes a WordNet object
-	public Outcast(WordNet wordnet) {
-		if (wordnet == null) {
-			throw new java.lang.NullPointerException();
-		}
 
-		wn = new WordNet(wordnet);
-	}
+    private static final String H = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/hypernyms.txt";
+    private static final String S = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/synsets.txt";
 
-	// given an array of WordNet nouns, return an outcast
-	public String outcast(String[] nouns) {
-		if (nouns == null || nouns.length == 0) {
-			throw new java.lang.NullPointerException();
-		}
+    private WordNet wn;
 
-		HashMap<Integer, HashMap<Integer, Integer>> ds = new HashMap<Integer, HashMap<Integer, Integer>>();
+    // constructor takes a WordNet object
+    public Outcast(WordNet wordnet) {
+        if (wordnet == null) {
+            throw new java.lang.NullPointerException();
+        }
 
-		int maxD = 0;
-		String outcast = "";
+        wn = wordnet;
+    }
 
-		int length = nouns.length;
-		for (int i = 0; i < length; i++) {
-			
-			String x = nouns[i];
-			int d = 0;
-			
-			for (int j = 0; j < length; j++) {
-				
-				if (i == j) {
-					continue;
-				}
+    // given an array of WordNet nouns, return an outcast
+    public String outcast(String[] nouns) {
+        if (nouns == null || nouns.length == 0) {
+            throw new java.lang.NullPointerException();
+        }
 
-				int dxy = 0;
-				
-				if (ds.containsKey(i) && ds.get(i).containsKey(j)) {
+        HashMap<Integer, HashMap<Integer, Integer>> ds = new HashMap<Integer, HashMap<Integer, Integer>>();
 
-					dxy = ds.get(i).get(j);
+        int maxD = 0;
+        String outcast = "";
 
-				} else if (ds.containsKey(j) && ds.get(j).containsKey(i)) {
+        int length = nouns.length;
+        for (int i = 0; i < length; i++) {
 
-					dxy = ds.get(j).get(i);
+            String x = nouns[i];
+            int d = 0;
 
-				} else {
+            for (int j = 0; j < length; j++) {
 
-					String y = nouns[j];
-					dxy = wn.distance(x, y);
-					if (!ds.containsKey(i)) {
-						ds.put(i, new HashMap<Integer, Integer>());
-					}
-					ds.get(i).put(j, dxy);
-				}
-				
-				d += dxy;
+                if (i == j) {
+                    continue;
+                }
 
-			}
-			
-			if (d > maxD) {
-				maxD = d;
-				outcast = x;
-			}
-		}
+                int dxy = 0;
 
-		return outcast;
-	}
+                if (ds.containsKey(i) && ds.get(i).containsKey(j)) {
 
-	private WordNet wn;
+                    dxy = ds.get(i).get(j);
 
-	// see test client below
-	public static void main(String[] args) {
-		test1();
-	}
+                } else if (ds.containsKey(j) && ds.get(j).containsKey(i)) {
 
-	private static void test1() {
-		System.out.println("test1");
-		
-		String[][] words = {
-				{"horse", "zebra","cat","bear","table"},
-				{"water", "soda", "bed", "orange_juice", "milk", "apple_juice", "tea", "coffee"},
-				{"apple", "pear", "peach", "banana", "lime", "lemon", "blueberry", "strawberry", "mango", "watermelon", "potato"}
-		};
-		
-		String[] outcasts = {"table","bed","potato"};
-		
-		WordNet wn = getWordNetFull();
-		Outcast oc = new Outcast(wn);
-		for (int i=0; i<outcasts.length; i++) {
-			String actual = oc.outcast(words[i]);
-			String expected = outcasts[i];
-			assert expected.equals(actual);
-		}
-	}
-	
-	private static WordNet getWordNetFull() {
-		return new WordNet(s, h);
-	}
+                    dxy = ds.get(j).get(i);
 
-	private static final String h = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/hypernyms.txt";
-	private static final String s = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/synsets.txt";
+                } else {
+
+                    String y = nouns[j];
+                    dxy = wn.distance(x, y);
+                    if (!ds.containsKey(i)) {
+                        ds.put(i, new HashMap<Integer, Integer>());
+                    }
+                    ds.get(i).put(j, dxy);
+                }
+
+                d += dxy;
+
+            }
+
+            if (d > maxD) {
+                maxD = d;
+                outcast = x;
+            }
+        }
+
+        return outcast;
+    }
+
+    // see test client below
+    public static void main(String[] args) {
+        test1();
+    }
+
+    private static void test1() {
+        System.out.println("test1");
+
+        String[][] words = {
+                { "horse", "zebra", "cat", "bear", "table" },
+                { "water", "soda", "bed", "orange_juice", "milk",
+                        "apple_juice", "tea", "coffee" },
+                { "apple", "pear", "peach", "banana", "lime", "lemon",
+                        "blueberry", "strawberry", "mango", "watermelon",
+                        "potato" } };
+
+        String[] outcasts = { "table", "bed", "potato" };
+
+        WordNet wn = getWordNetFull();
+        Outcast oc = new Outcast(wn);
+        for (int i = 0; i < outcasts.length; i++) {
+            String actual = oc.outcast(words[i]);
+            String expected = outcasts[i];
+            assert expected.equals(actual);
+        }
+    }
+
+    private static WordNet getWordNetFull() {
+        return new WordNet(S, H);
+    }
 }

@@ -11,6 +11,8 @@ import edu.princeton.cs.algs4.In;
 
 public class SAP {
 
+    private static String PATH = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/";
+
     private Digraph g;
     private Cache cache;
 
@@ -22,13 +24,13 @@ public class SAP {
         cache = new Cache();
     }
 
-    public SAP(SAP sap) {
-        if (sap == null) {
-            throw new java.lang.NullPointerException();
-        }
-        g = new Digraph(sap.g);
-        cache = new Cache();
-    }
+    // public SAP(SAP sap) {
+    // if (sap == null) {
+    // throw new java.lang.NullPointerException();
+    // }
+    // g = new Digraph(sap.g);
+    // cache = new Cache();
+    // }
 
     public int length(int v, int w) {
         Result r = determineAncestor(Arrays.asList(v), Arrays.asList(w));
@@ -255,10 +257,9 @@ public class SAP {
     }
 
     private static void testFromFile(String filename, int[][] data) {
-        String path = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/"
-                + filename;
+        String pathName = PATH + filename;
         for (int i = 0; i < data.length; i++) {
-            testFromFile(path, data[i][0], data[i][1], data[i][2], data[i][3]);
+            testFromFile(pathName, data[i][0], data[i][1], data[i][2], data[i][3]);
         }
     }
 
