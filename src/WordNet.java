@@ -1,3 +1,11 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.In;
+
 /*Corner cases.  
  * All methods and the constructor should throw a java.lang.NullPointerException 
  * if any argument is null. 
@@ -18,17 +26,20 @@ public class WordNet {
 
 	// constructor takes the name of the two input files
 	public WordNet(String synsets, String hypernyms) {
-		if (IsNullOrEmpty(synsets) || IsNullOrEmpty(hypernyms)) {
+		if (isNullOrEmpty(synsets) || isNullOrEmpty(hypernyms)) {
 			throw new java.lang.NullPointerException();
 		}
 
 		// The constructor should take time linearithmic (or better) in the
 		// input size.
+		
+		buildNounData(synsets);
+buildGraph(hypernyms);
 	}
 
 	// returns all WordNet nouns
 	public Iterable<String> nouns() {
-		return null;
+		return mapNoun2ID.keySet();
 	}
 
 	// is the word a WordNet noun?
@@ -36,7 +47,7 @@ public class WordNet {
 		// The method isNoun() should run in time logarithmic (or better) in the
 		// number of nouns.
 
-		return false;
+		return mapNoun2ID.containsKey(word);
 	}
 
 	// distance between nounA and nounB (defined below)
@@ -68,9 +79,56 @@ public class WordNet {
 		return null;
 	}
 
-	private boolean IsNullOrEmpty(String s) {
+	private boolean isNullOrEmpty(String s) {
 		return s == null || s == "";
 	}
+	
+	private void buildNounData(String filename) {
+		//example:
+		//36,AND_circuit AND_gate,a circuit in a computer that fires only when all of its inputs fire
+		mapID2Noun = new HashMap<Integer, HashSet<String>>();
+		mapNoun2ID = new HashMap<String, HashSet<Integer>>();
+		
+		In in = new In(filename);
+		while (in.hasNextLine()) {
+			String line = in.readLine();
+			String[] parts = line.split(",");
+			int id = Integer.parseInt(parts[0]);
+			String[] nouns = parts[1].split("\\s+");
+			
+			Arrays.stream(nouns).forEach(x-> {
+				if (!mapID2Noun.containsKey(id)){
+			mapID2Noun.put(id, new HashSet<String>());
+				}
+			mapID2Noun.get(id).add(x);
+			
+			if (!mapNoun2ID.containsKey(x)) {
+				mapNoun2ID.put(x, new HashSet<Integer>());
+			}
+			mapNoun2ID.get(x).add(id);
+			});
+		}
+	}
+	
+	private void buildGraph(String hypernyms) {
+		//example:
+		//164,21012,56099
+		
+		g = new Digraph(mapID2Noun.size());
+		
+		In hypernymsIn = new In(hypernyms);
+		while (hypernymsIn.hasNextLine()) {
+			String hyperLine = hypernymsIn.readLine();
+			int[] hyperParts = Arrays.stream(hyperLine.split(",")).mapToInt(Integer::parseInt).toArray();
+			
+			int f = hyperParts[0];
+			Arrays.stream(hyperParts).skip(1).forEach(x->g.addEdge(f, x));
+		}
+	}
+	
+	private Digraph g;
+	private HashMap<Integer,HashSet<String>> mapID2Noun;
+	private HashMap<String, HashSet<Integer>> mapNoun2ID;
 
 	// do unit testing of this class
 	public static void main(String[] args) {
