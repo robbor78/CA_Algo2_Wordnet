@@ -200,7 +200,9 @@ public class SAP {
 	// do unit testing of this class
 	public static void main(String[] args) {
 		test1();
+		testCycle();
 testDigraph1();
+testDigraph3();
 	}
 	
 	private static void test1() {
@@ -217,12 +219,40 @@ testFromGraph(g,1,5,2,0);
 		
 	}
 	
+	private static void testCycle() {
+		System.out.println("testCycle");
+		Digraph g = new Digraph(6);
+		g.addEdge(0, 1);
+		g.addEdge(1,2);
+		g.addEdge(2,3);
+		g.addEdge(3,4);
+		g.addEdge(4,5);
+		g.addEdge(5,0);
+		
+		testFromGraph(g,1,1,0,1);
+		testFromGraph(g,5,2,3,5);
+	}
+	
 	private static void testDigraph1() {
 		System.out.println("testDigraph1");
-		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",3,11,4,1);
-		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",9,12,3,5);
-		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",7,2,4,0);
-		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",1,6,-1,-1);
+		String filename = "digraph1.txt";
+		int[][] data = {{3,11,4,1}, {9,12,3,5}, {7,2,4,0}, {1,6,-1,-1}};
+		testFromFile(filename,data);
+	}
+	
+	
+	private static void testDigraph3() {
+		System.out.println("testDigraph3");
+		String filename = "digraph3.txt";
+		int[][] data = {{1,2,1,2},{1,7,-1,-1},{9,14,4,11}};
+		testFromFile(filename,data);
+	}
+	
+	private static void testFromFile(String filename, int[][] data) {
+		String path = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/"+filename;
+		for (int i=0; i<data.length; i++) {
+			testFromFile(path,data[i][0],data[i][1],data[i][2],data[i][3]);
+		}
 	}
 	
 	private static void testFromFile(String filename, int v, int w, int expectedLength, int expectedAncestor) {
