@@ -34,11 +34,16 @@ public class SAP {
 		if (G == null) {
 			throw new java.lang.NullPointerException();
 		}
-
 		g = new Digraph(G);
-
 		cache = new Cache();
+	}
 
+	public SAP(SAP sap) {
+		if (sap == null) {
+			throw new java.lang.NullPointerException();
+		}
+		g = new Digraph(sap.g);
+		cache = new Cache();
 	}
 
 	// length of shortest ancestral path between v and w; -1 if no such path
@@ -121,7 +126,7 @@ public class SAP {
 
 		Result r = null;
 		if (cache.isInCache(vName, wName)) {
-			r = cache.get(vName,wName);
+			r = cache.get(vName, wName);
 		} else {
 			int bestAncestor = 0;
 			int bestDistance = Integer.MAX_VALUE;
@@ -141,10 +146,14 @@ public class SAP {
 				if (visited[i]) {
 					continue;
 				}
-				
+
 				visited[i] = true;
 				Iterable<Integer> adj = g.adj(i);
-				adj.forEach(x-> {if(!visited[x]) {stack.add(x);}});
+				adj.forEach(x -> {
+					if (!visited[x]) {
+						stack.add(x);
+					}
+				});
 
 				if (vbfs.hasPathTo(i) && wbfs.hasPathTo(i)) {
 					int dv = vbfs.distTo(i);
@@ -156,7 +165,7 @@ public class SAP {
 						bestDistance = newDistance;
 						bestAncestor = i;
 						r = new Result(bestDistance, bestAncestor);
-						//System.out.println(r);
+						// System.out.println(r);
 					}
 				}
 
@@ -184,27 +193,27 @@ public class SAP {
 	private Digraph g;
 	private Cache cache;
 
-	
 	private class Cache {
 		private HashMap<String, HashMap<String, Result>> cache;
 
 		private Cache() {
 			cache = new HashMap<>();
 		}
-		
+
 		private boolean isInCache(String v, String w) {
-			boolean isInCache = cache.containsKey(v) && cache.get(v).containsKey(w);			
-//			if (isInCache) {
-//				cache.get(v).get(w).ts = Calendar.getInstance().getTime();
-//			}			
+			boolean isInCache = cache.containsKey(v)
+					&& cache.get(v).containsKey(w);
+			// if (isInCache) {
+			// cache.get(v).get(w).ts = Calendar.getInstance().getTime();
+			// }
 			return isInCache;
 		}
-		
+
 		private Result get(String v, String w) {
-			//cache.get(v).get(w).ts = Calendar.getInstance().getTime();
-			return cache.get(v).get(w);	
+			// cache.get(v).get(w).ts = Calendar.getInstance().getTime();
+			return cache.get(v).get(w);
 		}
-		
+
 		private void put(String v, String w, Result r) {
 			cache.put(v, new HashMap<String, Result>());
 			cache.get(v).put(w, r);
@@ -214,17 +223,18 @@ public class SAP {
 	private class Result {
 		private int length;
 		private int ancestor;
-		//private Date ts;
+
+		// private Date ts;
 
 		Result(int length, int ancestor) {
 			this.length = length;
 			this.ancestor = ancestor;
-			//ts = Calendar.getInstance().getTime();
+			// ts = Calendar.getInstance().getTime();
 		}
-		
+
 		@Override
 		public String toString() {
-			return length+" "+ancestor;
+			return length + " " + ancestor;
 		}
 	}
 
@@ -232,10 +242,10 @@ public class SAP {
 	public static void main(String[] args) {
 		test1();
 		testCycle();
-testDigraph1();
-testDigraph3();
+		testDigraph1();
+		testDigraph3();
 	}
-	
+
 	private static void test1() {
 		System.out.println("test1");
 		Digraph g = new Digraph(6);
@@ -245,58 +255,61 @@ testDigraph3();
 		g.addEdge(3, 4);
 		g.addEdge(4, 5);
 		g.addEdge(5, 0);
-		
-testFromGraph(g,1,5,2,0);
-		
+
+		testFromGraph(g, 1, 5, 2, 0);
+
 	}
-	
+
 	private static void testCycle() {
 		System.out.println("testCycle");
 		Digraph g = new Digraph(6);
 		g.addEdge(0, 1);
-		g.addEdge(1,2);
-		g.addEdge(2,3);
-		g.addEdge(3,4);
-		g.addEdge(4,5);
-		g.addEdge(5,0);
-		
-		testFromGraph(g,1,1,0,1);
-		testFromGraph(g,5,2,3,5);
+		g.addEdge(1, 2);
+		g.addEdge(2, 3);
+		g.addEdge(3, 4);
+		g.addEdge(4, 5);
+		g.addEdge(5, 0);
+
+		testFromGraph(g, 1, 1, 0, 1);
+		testFromGraph(g, 5, 2, 3, 5);
 	}
-	
+
 	private static void testDigraph1() {
 		System.out.println("testDigraph1");
 		String filename = "digraph1.txt";
-		int[][] data = {{3,11,4,1}, {9,12,3,5}, {7,2,4,0}, {1,6,-1,-1}};
-		testFromFile(filename,data);
+		int[][] data = { { 3, 11, 4, 1 }, { 9, 12, 3, 5 }, { 7, 2, 4, 0 },
+				{ 1, 6, -1, -1 } };
+		testFromFile(filename, data);
 	}
-	
-	
+
 	private static void testDigraph3() {
 		System.out.println("testDigraph3");
 		String filename = "digraph3.txt";
-		int[][] data = {{1,2,1,2},{1,7,-1,-1},{9,14,4,11}};
-		testFromFile(filename,data);
-	}
-	
-	private static void testFromFile(String filename, int[][] data) {
-		String path = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/"+filename;
-		for (int i=0; i<data.length; i++) {
-			testFromFile(path,data[i][0],data[i][1],data[i][2],data[i][3]);
-		}
-	}
-	
-	private static void testFromFile(String filename, int v, int w, int expectedLength, int expectedAncestor) {
-		In in = new In(filename);
-	    Digraph G = new Digraph(in);
-testFromGraph(G,v,w,expectedLength, expectedAncestor);
+		int[][] data = { { 1, 2, 1, 2 }, { 1, 7, -1, -1 }, { 9, 14, 4, 11 } };
+		testFromFile(filename, data);
 	}
 
-	private static void testFromGraph(Digraph G, int v, int w, int expectedLength, int expectedAncestor) {
-	    SAP sap = new SAP(G);
-	        int length   = sap.length(v, w);
-	        int ancestor = sap.ancestor(v, w);
-	        assert expectedLength == length;
-	        assert expectedAncestor == ancestor;
+	private static void testFromFile(String filename, int[][] data) {
+		String path = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/"
+				+ filename;
+		for (int i = 0; i < data.length; i++) {
+			testFromFile(path, data[i][0], data[i][1], data[i][2], data[i][3]);
+		}
+	}
+
+	private static void testFromFile(String filename, int v, int w,
+			int expectedLength, int expectedAncestor) {
+		In in = new In(filename);
+		Digraph G = new Digraph(in);
+		testFromGraph(G, v, w, expectedLength, expectedAncestor);
+	}
+
+	private static void testFromGraph(Digraph G, int v, int w,
+			int expectedLength, int expectedAncestor) {
+		SAP sap = new SAP(G);
+		int length = sap.length(v, w);
+		int ancestor = sap.ancestor(v, w);
+		assert expectedLength == length;
+		assert expectedAncestor == ancestor;
 	}
 }
