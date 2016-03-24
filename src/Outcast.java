@@ -71,5 +71,33 @@ public class Outcast {
 
 	// see test client below
 	public static void main(String[] args) {
+		test1();
 	}
+
+	private static void test1() {
+		System.out.println("test1");
+		
+		String[][] words = {
+				{"horse", "zebra","cat","bear","table"},
+				{"water", "soda", "bed", "orange_juice", "milk", "apple_juice", "tea", "coffee"},
+				{"apple", "pear", "peach", "banana", "lime", "lemon", "blueberry", "strawberry", "mango", "watermelon", "potato"}
+		};
+		
+		String[] outcasts = {"table","bed","potato"};
+		
+		WordNet wn = getWordNetFull();
+		Outcast oc = new Outcast(wn);
+		for (int i=0; i<outcasts.length; i++) {
+			String actual = oc.outcast(words[i]);
+			String expected = outcasts[i];
+			assert expected.equals(actual);
+		}
+	}
+	
+	private static WordNet getWordNetFull() {
+		return new WordNet(s, h);
+	}
+
+	private static final String h = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/hypernyms.txt";
+	private static final String s = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/synsets.txt";
 }
