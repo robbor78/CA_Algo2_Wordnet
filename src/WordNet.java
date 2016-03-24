@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.function.Function;
 
 import edu.princeton.cs.algs4.Digraph;
@@ -58,7 +59,7 @@ buildGraph(hypernyms);
 		 * java.lang.IllegalArgumentException unless both of the noun arguments
 		 * are WordNet nouns.
 		 */
-		Function3<Integer,Integer,Integer> f = (v,w) -> sap.length(v, w);
+		Function3<Iterable<Integer>,Iterable<Integer>,Integer> f = (v,w) -> sap.length(v, w);
 		return searchWordNet(nounA,nounB,f);
 	}
 
@@ -74,12 +75,12 @@ buildGraph(hypernyms);
 		// The methods distance() and sap() should run in time linear in the
 		// size of the WordNet digraph.
 
-		Function3<Integer,Integer,Integer> f = (v,w) -> sap.ancestor(v, w);
+		Function3<Iterable<Integer>,Iterable<Integer>,Integer> f = (v,w) -> sap.ancestor(v, w);
 		int ancestor = searchWordNet(nounA,nounB,f);
 		return mapID2Noun.get(ancestor);//.iterator().next();
 	}
 	
-	private <T> T searchWordNet(String nounA, String nounB, Function3<Integer, Integer, T> f) {
+	private <T> T searchWordNet(String nounA, String nounB, Function3<Iterable<Integer>, Iterable<Integer>, T> f) {
 		if (!isNoun(nounA) || !isNoun(nounB)) {
 			throw new java.lang.IllegalArgumentException();
 		}
@@ -87,10 +88,10 @@ buildGraph(hypernyms);
 		// The methods distance() and sap() should run in time linear in the
 		// size of the WordNet digraph.
 				
-		int a = mapNoun2ID.get(nounA).iterator().next();
-		int b = mapNoun2ID.get(nounB).iterator().next();
-		
-		return f.apply(a,b);
+
+		Iterable<Integer> ai = mapNoun2ID.get(nounA);
+		Iterable<Integer> bi = mapNoun2ID.get(nounB);		
+		return f.apply(ai,bi);
 	}
 
 	private boolean isNullOrEmpty(String s) {
@@ -114,12 +115,12 @@ buildGraph(hypernyms);
 			}
 			
 		String[] nouns = parts[1].split("\\s+");
-			Arrays.stream(nouns).forEach(x-> {
+			Arrays.stream(nouns).forEach(noun-> {
 			
-			if (!mapNoun2ID.containsKey(x)) {
-				mapNoun2ID.put(x, new HashSet<Integer>());
+			if (!mapNoun2ID.containsKey(noun)) {
+				mapNoun2ID.put(noun, new HashSet<Integer>());
 			}
-			mapNoun2ID.get(x).add(id);
+			mapNoun2ID.get(noun).add(id);
 			});
 		}
 	}
@@ -154,8 +155,8 @@ buildGraph(hypernyms);
 
 	// do unit testing of this class
 	public static void main(String[] args) {
-testLoadWordNet();
-test1();
+//testLoadWordNet();
+//test1();
 testDistance();
 	}
 	
@@ -174,8 +175,9 @@ testDistance();
 		
 		
 		for (int i=0; i<distances.length;i++) {
+			//for (int i=0; i<1;i++) {
 		int actualDistance = wn.distance(words[i][0],words[i][1]);
-		System.out.println(wn.sap(words[i][0],words[i][1]));
+		//System.out.println(wn.sap(words[i][0],words[i][1])+" "+actualDistance);
 		int expectedDistance = distances[i];
 		assert expectedDistance == actualDistance;
 		}

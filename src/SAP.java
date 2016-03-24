@@ -154,6 +154,7 @@ public class SAP {
 						bestDistance = newDistance;
 						bestAncestor = i;
 						r = new Result(bestDistance, bestAncestor);
+						//System.out.println(r);
 					}
 				}
 
@@ -194,6 +195,11 @@ public class SAP {
 		Result(int length, int ancestor) {
 			this.length = length;
 			this.ancestor = ancestor;
+		}
+		
+		@Override
+		public String toString() {
+			return length+" "+ancestor;
 		}
 	}
 
