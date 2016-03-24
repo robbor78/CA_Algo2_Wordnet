@@ -199,15 +199,43 @@ public class SAP {
 
 	// do unit testing of this class
 	public static void main(String[] args) {
-		In in = new In(args[0]);
+		test1();
+testDigraph1();
+	}
+	
+	private static void test1() {
+		System.out.println("test1");
+		Digraph g = new Digraph(6);
+		g.addEdge(1, 0);
+		g.addEdge(1, 2);
+		g.addEdge(2, 3);
+		g.addEdge(3, 4);
+		g.addEdge(4, 5);
+		g.addEdge(5, 0);
+		
+testFromGraph(g,1,5,2,0);
+		
+	}
+	
+	private static void testDigraph1() {
+		System.out.println("testDigraph1");
+		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",3,11,4,1);
+		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",9,12,3,5);
+		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",7,2,4,0);
+		testFromFile("/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/1wordnet/wordnet/digraph1.txt",1,6,-1,-1);
+	}
+	
+	private static void testFromFile(String filename, int v, int w, int expectedLength, int expectedAncestor) {
+		In in = new In(filename);
 	    Digraph G = new Digraph(in);
+testFromGraph(G,v,w,expectedLength, expectedAncestor);
+	}
+
+	private static void testFromGraph(Digraph G, int v, int w, int expectedLength, int expectedAncestor) {
 	    SAP sap = new SAP(G);
-	    while (!StdIn.isEmpty()) {
-	        int v = StdIn.readInt();
-	        int w = StdIn.readInt();
 	        int length   = sap.length(v, w);
 	        int ancestor = sap.ancestor(v, w);
-	        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
-	    }
+	        assert expectedLength == length;
+	        assert expectedAncestor == ancestor;
 	}
 }
